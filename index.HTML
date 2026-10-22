@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>The Wedding Invitation | Anamatullah & Alfisha</title>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com"></script>
+<!-- Font Awesome -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<!-- Google Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Cinzel:wght@500;700;800&family=Great+Vibes&family=Playfair+Display:ital,wght@0,500;0,700;1,400&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+<!-- Canvas Confetti -->
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+<script>
+tailwind.config = {
+theme: {
+extend: {
+colors: {
+regal: {
+ivory: '#FFFDF9',
+cream: '#FDF7EB',
+goldLight: '#F3DB83',
+gold: '#C99D3B',
+goldDark: '#8B6514',
+emerald: '#0B2B20',
+emeraldDeep: '#061A13',
+emeraldLight: '#184938',
+maroon: '#4A0E17'
+}
+},
+fontFamily: {
+cinzel: ['"Cinzel"', 'serif'],
+script: ['"Great Vibes"', 'cursive'],
+serif: ['"Playfair Display"', 'serif'],
+arabic: ['"Amiri"', 'serif'],
+sans: ['"Poppins"', 'sans-serif'],
+}
+}
+}
+}
+</script>
+<style>
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: #061A13; }
+::-webkit-scrollbar-thumb { background: #C99D3B; border-radius: 4px; }
+.islamic-dome-card {
+border-top-left-radius: 50% 15%;
+border-top-right-radius: 50% 15%;
+}
+@keyframes sway {
+0% { transform: rotate(-4deg); }
+50% { transform: rotate(4deg); }
+100% { transform: rotate(-4deg); }
+}
+.lantern-left { transform-origin: top center; animation: sway 5s ease-in-out infinite; }
+.lantern-right { transform-origin: top center; animation: sway 6s ease-in-out infinite 0.5s; }
+@keyframes glow {
+0%, 100% { filter: drop-shadow(0 0 10px rgba(243, 219, 131, 0.6)); }
+50% { filter: drop-shadow(0 0 20px rgba(243, 219, 131, 0.9)); }
+}
+.glow-effect { animation: glow 3s ease-in-out infinite alternate; }
+@keyframes soundWave {
+0%, 100% { height: 4px; }
+50% { height: 16px; }
+}
+.wave-1 { animation: soundWave 1.2s ease-in-out infinite; }
+.wave-2 { animation: soundWave 0.8s ease-in-out infinite 0.2s; }
+.wave-3 { animation: soundWave 1.4s ease-in-out infinite 0.4s; }
+#ambientCanvas {
+position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 15;
+}
+.envelope-overlay { transition: opacity 0.8s ease, visibility 0.8s ease; }
+.envelope-overlay.hidden-envelope { opacity: 0; visibility: hidden; pointer-events: none; }
+.wax-seal {
+box-shadow: 0 6px 20px rgba(74, 14, 23, 0.5), inset 0 2px 4px rgba(255, 255, 255, 0.4);
+transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+.wax-seal:hover { transform: scale(1.08) rotate(3deg); }
+</style>
+</head>
+<body class="bg-[#05140E] text-stone-800 font-sans antialiased overflow-x-hidden selection:bg-regal-gold selection:text-white">
+<!-- Background Music Audio Element (Make sure your file is named music.mp3 in the same directory) -->
+<audio id="weddingBgm" loop preload="auto">
+<source src="music.mp3" type="audio/mpeg">
+Your browser does not support the audio element.
+</audio>
+<canvas id="ambientCanvas"></canvas>
+<!-- 1. ENVELOPE UNBOXING MODAL -->
+<div id="envelopeModal" class="envelope-overlay fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#040E0A]/95 backdrop-blur-md">
+<div class="relative w-full max-w-md bg-[#FFFBF0] rounded-2xl p-6 sm:p-8 text-center border-2 border-regal-gold shadow-2xl overflow-hidden">
+<div class="text-regal-goldDark font-arabic text-2xl mb-1 mt-2">بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ</div>
+<p class="font-cinzel text-xs tracking-widest text-regal-goldDark font-semibold uppercase mt-1">Royal Wedding Invitation</p>
+<div class="my-6">
+<h2 class="font-serif italic text-2xl text-regal-emerald font-bold">Anamatullah Siddiqui</h2>
+<span class="font-script text-2xl text-regal-gold">&</span>
+<h2 class="font-serif italic text-2xl text-regal-emerald font-bold">Alfisha Khan</h2>
+</div>
+<div class="flex flex-col items-center justify-center my-6">
+<button id="openInvitationBtn" 
+class="wax-seal w-20 h-20 rounded-full bg-gradient-to-br from-[#801322] to-[#4A0E17] text-[#FFDF89] border-2 border-[#DDA335] flex flex-col items-center justify-center cursor-pointer group active:scale-95 transition-transform"
+title="Tap to Open">
+<i class="fa-solid fa-gem text-lg group-hover:rotate-45 transition-transform duration-500"></i>
+<span class="text-[9px] font-cinzel font-bold tracking-widest mt-1 uppercase text-[#FCE198]">OPEN</span>
+</button>
+<span class="text-xs font-sans text-stone-500 mt-3 animate-pulse">
+<i class="fa-solid fa-hand-pointer mr-1 text-regal-gold"></i> Tap the Royal Seal to open & play music
+</span>
+</div>
+<p class="text-[11px] text-stone-400 font-serif italic border-t border-regal-gold/20 pt-3">
+"And We Created You in Pairs" (Quran 78:8)
+</p>
+</div>
+</div>
+<!-- 2. STICKY TOP CONTROLS -->
+<header class="fixed top-3 inset-x-0 z-40 px-3 sm:px-6 pointer-events-none">
+<div class="max-w-4xl mx-auto flex items-center justify-between pointer-events-auto">
+<div class="bg-regal-emeraldDeep/80 backdrop-blur-md border border-regal-gold/40 text-regal-goldLight px-3.5 py-1.5 rounded-full shadow-lg flex items-center gap-2">
+<i class="fa-solid fa-moon text-xs text-regal-gold"></i>
+<span class="text-[11px] font-cinzel tracking-wider font-semibold">Anamatullah & Alfisha</span>
+</div>
+<div class="flex items-center gap-2">
+<button id="musicToggleBtn" 
+class="bg-regal-emeraldDeep/90 backdrop-blur-md border border-regal-gold/50 text-regal-goldLight hover:bg-regal-gold hover:text-regal-emeraldDeep px-3 py-1.5 rounded-full shadow-lg flex items-center gap-2 transition-all">
+<div id="equalizerWave" class="hidden items-end gap-0.5 h-4">
+<span class="w-1 bg-regal-gold wave-1 rounded-sm"></span>
+<span class="w-1 bg-regal-goldLight wave-2 rounded-sm"></span>
+<span class="w-1 bg-regal-gold wave-3 rounded-sm"></span>
+</div>
+<i id="musicIcon" class="fa-solid fa-music text-xs"></i>
+<span id="musicLabel" class="text-[11px] font-sans font-semibold">Music</span>
+</button>
+<button onclick="shareOnWhatsApp()" 
+class="w-8 h-8 rounded-full bg-regal-emeraldDeep/90 backdrop-blur-md border border-regal-gold/50 text-regal-goldLight hover:bg-[#25D366] hover:text-white flex items-center justify-center shadow-lg transition-all"
+title="Share on WhatsApp">
+<i class="fa-brands fa-whatsapp text-sm"></i>
+</button>
+</div>
+</div>
+</header>
+<!-- 3. MAIN CARD -->
+<div class="relative min-h-screen pt-14 pb-20 px-3 sm:px-6 flex justify-center items-center">
+<main class="w-full max-w-2xl bg-regal-ivory rounded-3xl sm:rounded-[2.5rem] p-4 sm:p-10 border-4 border-[#C99D3B] shadow-[0_10px_50px_rgba(0,0,0,0.8)] relative z-20 overflow-hidden">
+<div class="absolute inset-2 sm:inset-3 border border-[#C99D3B]/40 rounded-[1.6rem] pointer-events-none"></div>
+<!-- Hanging Lanterns -->
+<div class="absolute top-0 left-6 w-10 lantern-left pointer-events-none z-10">
+<svg viewBox="0 0 50 120" fill="none">
+<line x1="25" y1="0" x2="25" y2="30" stroke="#C99D3B" stroke-width="1.5"/>
+<path d="M10 30 L40 30 L35 70 L15 70 Z" fill="#FDF3C7" stroke="#C99D3B" stroke-width="1.5"/>
+<circle cx="25" cy="50" r="5" fill="#F59E0B" class="glow-effect"/>
+<path d="M15 70 L35 70 L25 85 Z" fill="#966E18"/>
+</svg>
+</div>
+<div class="absolute top-0 right-6 w-10 lantern-right pointer-events-none z-10">
+<svg viewBox="0 0 50 120" fill="none">
+<line x1="25" y1="0" x2="25" y2="30" stroke="#C99D3B" stroke-width="1.5"/>
+<path d="M10 30 L40 30 L35 70 L15 70 Z" fill="#FDF3C7" stroke="#C99D3B" stroke-width="1.5"/>
+<circle cx="25" cy="50" r="5" fill="#F59E0B" class="glow-effect"/>
+<path d="M15 70 L35 70 L25 85 Z" fill="#966E18"/>
+</svg>
+</div>
+<!-- Header Section -->
+<section class="text-center pt-6 pb-4 relative z-20">
+<p class="font-arabic text-3xl sm:text-4xl text-regal-goldDark tracking-wide mb-2" dir="rtl">بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ</p>
+<p class="text-xs font-serif italic text-stone-600 font-semibold">"In the name of Allah, The Most Gracious, The Most Merciful"</p>
+<div class="inline-flex items-center gap-2 bg-regal-cream border border-regal-gold/50 px-4 py-1.5 rounded-full my-3 shadow-inner">
+<i class="fa-solid fa-heart text-[10px] text-regal-gold"></i>
+<span class="font-serif text-xs font-bold text-regal-emerald">"And We created you in pairs"</span>
+<span class="text-[10px] text-regal-goldDark font-semibold">(Quran 78:8)</span>
+</div>
+<p class="text-xs uppercase tracking-[0.25em] text-stone-500 mt-3 font-medium">Together With Our Families</p>
+<div class="my-6">
+<h1 class="font-script text-4xl sm:text-6xl text-regal-emerald">Anamatullah Siddiqui</h1>
+<div class="my-1 font-serif italic text-regal-goldDark font-bold text-lg">with</div>
+<h2 class="font-script text-4xl sm:text-6xl text-regal-emerald">Alfisha Khan</h2>
+<p class="text-[11px] font-cinzel tracking-widest text-regal-goldDark font-bold uppercase mt-2">Two Souls, One Journey With Allah's Blessings</p>
+</div>
+</section>
+<!-- Countdown Timer -->
+<section class="my-6 bg-regal-emerald text-white rounded-2xl p-4 border border-regal-gold/50 shadow-lg text-center">
+<h3 class="text-xs uppercase font-cinzel tracking-widest text-regal-goldLight font-bold mb-3">Countdown to Nikah</h3>
+<div class="grid grid-cols-4 gap-2 max-w-xs mx-auto text-white">
+<div class="bg-black/30 rounded-lg p-2 border border-regal-gold/30"><span id="days" class="block font-bold text-lg text-regal-goldLight">00</span><span class="text-[9px] uppercase">Days</span></div>
+<div class="bg-black/30 rounded-lg p-2 border border-regal-gold/30"><span id="hours" class="block font-bold text-lg text-regal-goldLight">00</span><span class="text-[9px] uppercase">Hours</span></div>
+<div class="bg-black/30 rounded-lg p-2 border border-regal-gold/30"><span id="minutes" class="block font-bold text-lg text-regal-goldLight">00</span><span class="text-[9px] uppercase">Mins</span></div>
+<div class="bg-black/30 rounded-lg p-2 border border-regal-gold/30"><span id="seconds" class="block font-bold text-lg text-amber-300">00</span><span class="text-[9px] uppercase">Secs</span></div>
+</div>
+</section>
+<!-- Events Itinerary -->
+<section class="my-8 grid grid-cols-1 md:grid-cols-2 gap-6">
+<!-- Nikah Card -->
+<div class="islamic-dome-card bg-white rounded-2xl p-5 border-2 border-regal-gold/50 shadow-md relative flex flex-col justify-between">
+<div class="w-10 h-10 mx-auto -mt-9 rounded-full bg-regal-emerald text-regal-goldLight flex items-center justify-center border-2 border-regal-gold shadow">
+<i class="fa-solid fa-ring text-sm"></i>
+</div>
+<div class="text-center mt-2">
+<span class="text-[10px] font-cinzel tracking-widest text-regal-goldDark font-bold uppercase">Holy Knot</span>
+<h4 class="font-cinzel text-lg font-bold text-regal-emerald">NIKAH</h4>
+<div class="my-2 py-1.5 border-y border-stone-200 text-xs font-semibold">
+<p class="text-stone-900"><i class="fa-regular fa-calendar-days text-regal-gold mr-1"></i> Friday, 18 December 2026</p>
+<p class="text-stone-700 mt-1"><i class="fa-regular fa-clock text-regal-gold mr-1"></i> 8:00 PM</p>
+</div>
+<div class="bg-regal-cream p-2.5 rounded-lg border border-regal-gold/20 text-left text-xs">
+<p class="font-bold text-regal-emerald"><i class="fa-solid fa-location-dot text-rose-600 mr-1"></i> Lucknow Garden</p>
+<p class="text-stone-600 pl-4 mt-0.5">IIM Road, Mubarakpur, Lucknow</p>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-2 mt-4 pt-2 border-t border-stone-100">
+<a href="https://www.google.com/maps/search/?api=1&query=Lucknow+Garden+IIM+Road+Mubarakpur+Lucknow" target="_blank" class="py-1.5 text-center bg-stone-100 hover:bg-regal-gold hover:text-white text-stone-800 text-xs font-semibold rounded border border-stone-300">Map Route</a>
+<button onclick="downloadICS('Nikah - Anamatullah & Alfisha', 'Lucknow Garden, IIM Road, Mubarakpur, Lucknow', '20261218T200000', '20261218T233000')" class="py-1.5 bg-regal-emerald text-white text-xs font-semibold rounded">Add Cal</button>
+</div>
+</div>
+<!-- Reception Card -->
+<div class="islamic-dome-card bg-white rounded-2xl p-5 border-2 border-regal-gold/50 shadow-md relative flex flex-col justify-between">
+<div class="w-10 h-10 mx-auto -mt-9 rounded-full bg-regal-emerald text-regal-goldLight flex items-center justify-center border-2 border-regal-gold shadow">
+<i class="fa-solid fa-utensils text-sm"></i>
+</div>
+<div class="text-center mt-2">
+<span class="text-[10px] font-cinzel tracking-widest text-regal-goldDark font-bold uppercase">Grand Feast</span>
+<h4 class="font-cinzel text-lg font-bold text-regal-emerald">WALIMA / RECEPTION</h4>
+<div class="my-2 py-1.5 border-y border-stone-200 text-xs font-semibold">
+<p class="text-stone-900"><i class="fa-regular fa-calendar-days text-regal-gold mr-1"></i> Monday, 21 December 2026</p>
+<p class="text-stone-700 mt-1"><i class="fa-regular fa-clock text-regal-gold mr-1"></i> 7:00 PM Onwards</p>
+</div>
+<div class="bg-regal-cream p-2.5 rounded-lg border border-regal-gold/20 text-left text-xs">
+<p class="font-bold text-regal-emerald"><i class="fa-solid fa-location-dot text-rose-600 mr-1"></i> Barat Ghar</p>
+<p class="text-stone-600 pl-4 mt-0.5">Near Lal Masjid, Balaganj, Lucknow</p>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-2 mt-4 pt-2 border-t border-stone-100">
+<a href="https://www.google.com/maps/search/?api=1&query=Barat+Ghar+Near+Lal+Masjid+Balaganj+Lucknow" target="_blank" class="py-1.5 text-center bg-stone-100 hover:bg-regal-gold hover:text-white text-stone-800 text-xs font-semibold rounded border border-stone-300">Map Route</a>
+<button onclick="downloadICS('Reception - Anamatullah & Alfisha', 'Barat Ghar, Balaganj, Lucknow', '20261221T190000', '20261221T233000')" class="py-1.5 bg-regal-emerald text-white text-xs font-semibold rounded">Add Cal</button>
+</div>
+</div>
+</section>
+<!-- RSVP & Compliments -->
+<section class="my-6 bg-regal-cream/70 rounded-2xl p-4 border border-regal-gold/40 grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+<div>
+<h5 class="font-cinzel font-bold text-regal-goldDark uppercase mb-2">RSVP</h5>
+<ul class="space-y-1.5 text-stone-800 font-medium">
+<li class="flex justify-between bg-white p-2 rounded border"><span>Nematullah Siddiqui</span><a href="https://wa.me/919305556878" target="_blank" class="text-emerald-600"><i class="fa-brands fa-whatsapp"></i></a></li>
+<li class="flex justify-between bg-white p-2 rounded border"><span>Akber Siddiqui</span><a href="https://wa.me/919554785799" target="_blank" class="text-emerald-600"><i class="fa-brands fa-whatsapp"></i></a></li>
+<li class="flex justify-between bg-white p-2 rounded border"><span>Israr Siddiqui</span><a href="https://wa.me/919305556878" target="_blank" class="text-emerald-600"><i class="fa-brands fa-whatsapp"></i></a></li>
+</ul>
+</div>
+<div>
+<h5 class="font-cinzel font-bold text-regal-goldDark uppercase mb-2">With Best Compliments From</h5>
+<ul class="space-y-1.5 text-stone-800 font-medium">
+<li class="bg-white p-2 rounded border">Wajid Ali Siddiqui</li>
+<li class="bg-white p-2 rounded border">Sajid Ali Siddiqui</li>
+<li class="bg-white p-2 rounded border">Faizanullah</li>
+</ul>
+</div>
+</section>
+<!-- Host Contact Details -->
+<section class="bg-regal-emerald text-white rounded-2xl p-5 text-center border-2 border-regal-gold/60 shadow-lg">
+<p class="text-[10px] font-cinzel tracking-widest text-regal-goldLight uppercase">Warmly Hosted By</p>
+<h4 class="font-serif text-2xl font-bold mt-0.5">Nazim Siddiqui</h4>
+<p class="text-xs text-stone-200 mt-1"><i class="fa-solid fa-location-dot text-regal-gold"></i> Sikrori, Lucknow - 226101</p>
+<div class="mt-4 pt-3 border-t border-white/20 flex flex-wrap justify-center gap-3 text-xs">
+<div class="bg-white/10 px-3 py-1.5 rounded-lg flex items-center gap-2">
+<span>9305556878</span>
+<a href="tel:9305556878" class="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center"><i class="fa-solid fa-phone text-[10px]"></i></a>
+<a href="https://wa.me/919305556878" target="_blank" class="w-6 h-6 rounded-full bg-emerald-600 flex items-center justify-center"><i class="fa-brands fa-whatsapp text-[10px]"></i></a>
+</div>
+<div class="bg-white/10 px-3 py-1.5 rounded-lg flex items-center gap-2">
+<span>9554785799</span>
+<a href="tel:9554785799" class="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center"><i class="fa-solid fa-phone text-[10px]"></i></a>
+<a href="https://wa.me/919554785799" target="_blank" class="w-6 h-6 rounded-full bg-emerald-600 flex items-center justify-center"><i class="fa-brands fa-whatsapp text-[10px]"></i></a>
+</div>
+</div>
+</section>
+<!-- Guestbook / Dua -->
+<section class="my-6 bg-white rounded-2xl p-4 border border-regal-gold/30">
+<h4 class="font-serif text-base font-bold text-regal-emerald text-center mb-2"><i class="fa-solid fa-hands-praying text-regal-gold mr-1"></i> Send Dua & Best Wishes</h4>
+<form onsubmit="submitDua(event)" class="space-y-2 text-xs">
+<input type="text" id="guestName" required placeholder="Your Name" class="w-full px-3 py-2 rounded border border-stone-300">
+<textarea id="guestMessage" required rows="2" placeholder="Write your Dua / Mubarak message..." class="w-full px-3 py-2 rounded border border-stone-300"></textarea>
+<button type="submit" class="w-full py-2 bg-regal-goldDark text-white font-bold rounded">Send Mubarak & Dua</button>
+</form>
+<div id="wishesContainer" class="mt-3 space-y-1.5 max-h-36 overflow-y-auto text-xs"></div>
+</section>
+<!-- Share Button -->
+<div class="text-center mt-6">
+<button onclick="shareOnWhatsApp()" class="w-full py-3 bg-[#25D366] text-white font-bold text-sm rounded-full shadow-lg flex items-center justify-center gap-2">
+<i class="fa-brands fa-whatsapp text-lg"></i> Share Invitation on WhatsApp
+</button>
+</div>
+</main>
+</div>
+<script>
+const envelopeModal = document.getElementById('envelopeModal');
+const openBtn = document.getElementById('openInvitationBtn');
+const bgm = document.getElementById('weddingBgm');
+const musicBtn = document.getElementById('musicToggleBtn');
+const equalizer = document.getElementById('equalizerWave');
+const musicIcon = document.getElementById('musicIcon');
+let isPlaying = false;
+openBtn.addEventListener('click', () => {
+confetti({ particleCount: 60, spread: 60, origin: { y: 0.6 } });
+toggleMusic(true);
+envelopeModal.classList.add('hidden-envelope');
+setTimeout(() => envelopeModal.remove(), 900);
+});
+musicBtn.addEventListener('click', () => toggleMusic(!isPlaying));
+function toggleMusic(play) {
+isPlaying = play;
+if (play) {
+bgm.play().catch(() => {});
+equalizer.classList.remove('hidden');
+equalizer.classList.add('flex');
+musicIcon.classList.add('hidden');
+} else {
+bgm.pause();
+equalizer.classList.add('hidden');
+equalizer.classList.remove('flex');
+musicIcon.classList.remove('hidden');
+}
+}
+// Countdown Timer
+const targetTime = new Date("2026-12-18T20:00:00+05:30").getTime();
+setInterval(() => {
+const now = new Date().getTime();
+const diff = targetTime - now;
+if (diff > 0) {
+document.getElementById('days').innerText = String(Math.floor(diff / (1000606024))).padStart(2,'0');
+document.getElementById('hours').innerText = String(Math.floor((diff % (1000606024)) / (10006060))).padStart(2,'0');
+document.getElementById('minutes').innerText = String(Math.floor((diff % (10006060)) / (100060))).padStart(2,'0');
+document.getElementById('seconds').innerText = String(Math.floor((diff % (100060)) / 1000)).padStart(2,'0');
+}
+}, 1000);
+// Confetti canvas particles
+const canvas = document.getElementById("ambientCanvas");
+const ctx = canvas.getContext("2d");
+let w = canvas.width = window.innerWidth;
+let h = canvas.height = window.innerHeight;
+window.addEventListener("resize", () => { w = canvas.width = window.innerWidth; h = canvas.height = window.innerHeight; });
+const parts = Array.from({length: 30}, () => ({
+x: Math.random() * w, y: Math.random() * h, r: Math.random() * 2 + 1, vy: Math.random() * 0.6 + 0.3, color: Math.random() > 0.5 ? '#F3DB83' : '#E05660'
+}));
+function loop() {
+ctx.clearRect(0,0,w,h);
+parts.forEach(p => {
+p.y += p.vy; if (p.y > h) p.y = -10;
+ctx.fillStyle = p.color; ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI*2); ctx.fill();
+});
+requestAnimationFrame(loop);
+}
+loop();
+// Guestbook Dua
+function loadDuas() {
+const container = document.getElementById('wishesContainer');
+const duas = JSON.parse(localStorage.getItem('wedding_duas') || '[]');
+container.innerHTML = duas.map(d => ⁠<div class="bg-stone-50 p-2 rounded border"><strong>${d.name}:</strong> ${d.msg}</div>⁠).join('');
+}
+function submitDua(e) {
+e.preventDefault();
+const name = document.getElementById('guestName').value.trim();
+const msg = document.getElementById('guestMessage').value.trim();
+if(!name || !msg) return;
+const duas = JSON.parse(localStorage.getItem('wedding_duas') || '[]');
+duas.unshift({name, msg});
+localStorage.setItem('wedding_duas', JSON.stringify(duas));
+document.getElementById('guestName').value = '';
+document.getElementById('guestMessage').value = '';
+loadDuas();
+confetti({ particleCount: 40, spread: 50 });
+}
+loadDuas();
+function downloadICS(title, venue, start, end) {
+const ics = ⁠BEGIN:VCALENDAR\nVERSION:2.0\nBEGIN:VEVENT\nSUMMARY:${title}\nLOCATION:${venue}\nDTSTART:${start}\nDTEND:${end}\nEND:VEVENT\nEND:VCALENDAR⁠;
+const blob = new Blob([ics], {type: 'text/calendar'});
+const link = document.createElement('a');
+link.href = URL.createObjectURL(blob);
+link.download = 'wedding_event.ics';
+link.click();
+}
+function shareOnWhatsApp() {
+const text = ⁠*Wedding Invitation* 💍\n\nAnamatullah Siddiqui & Alfisha Khan\n\n✨ *Nikah:* 18 Dec 2026, Lucknow Garden, Lucknow\n✨ *Walima:* 21 Dec 2026, Barat Ghar, Balaganj, Lucknow\n\nHosted by Nazim Siddiqui (9305556878).\n\nView full invite: ${window.location.href}⁠;
+window.open(⁠https://api.whatsapp.com/send?text=${encodeURIComponent(text)}⁠, '_blank');
+}
+</script>
+</body>
+</html>
